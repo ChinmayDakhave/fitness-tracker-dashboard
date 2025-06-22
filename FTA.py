@@ -796,7 +796,7 @@ elif page == '🔍 Deep Dive Analytics':
     comp_matrix = comp_matrix.reset_index()
     
     # Display competitive matrix
-    st.write(
+    st.dataframe(
         comp_matrix.style.background_gradient(subset=['Avg_Rating', 'Total_Reviews'], cmap='Greens')
                           .background_gradient(subset=['Avg_Price'], cmap='Reds_r')
                           .background_gradient(subset=['Avg_Discount'], cmap='Blues'),
