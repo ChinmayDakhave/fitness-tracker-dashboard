@@ -92,7 +92,7 @@ st.sidebar.markdown("""
 # Navigation
 page = st.sidebar.selectbox(
     '📍 Navigate to',
-    ['🏠 Executive Summary', '💰 Market Intelligence', '⭐ Quality Insights', 
+    ['🏠 Executive Summary', 
      '📊 Feature Analysis', '🏆 Product Rankings', '🔍 Deep Dive Analytics']
 )
 
@@ -188,59 +188,7 @@ if page == '🏠 Executive Summary':
         </div>
         """, unsafe_allow_html=True)
     
-    # Market Share Analysis
-    st.markdown("### 🏢 Market Landscape")
-    col1, col2 = st.columns(2)
-    
-    with col1:
-        # Brand market share by count
-        brand_counts = filtered_df['Brand Name'].value_counts()
-        fig_market_share = px.pie(
-            values=brand_counts.values, 
-            names=brand_counts.index,
-            title="Market Share by Product Count",
-            color_discrete_sequence=colors,
-            hole=0.4
-        )
-        fig_market_share.update_layout(
-            font=dict(size=12),
-            showlegend=True,
-            height=400
-        )
-        st.plotly_chart(fig_market_share, use_container_width=True)
-    
-    with col2:
-        # Revenue share (estimated)
-        brand_revenue = filtered_df.groupby('Brand Name')['Selling Price'].sum().sort_values(ascending=False)
-        fig_revenue_share = px.pie(
-            values=brand_revenue.values,
-            names=brand_revenue.index,
-            title="Market Share by Revenue Potential",
-            color_discrete_sequence=colors,
-            hole=0.4
-        )
-        fig_revenue_share.update_layout(
-            font=dict(size=12),
-            showlegend=True,
-            height=400
-        )
-        st.plotly_chart(fig_revenue_share, use_container_width=True)
-    
-    # Price vs Rating Scatter with insights
-    st.markdown("### 💡 Market Intelligence")
-    fig_scatter = px.scatter(
-        filtered_df, 
-        x='Selling Price', 
-        y='Rating (Out of 5)',
-        size='Reviews',
-        color='Brand Name',
-        hover_data=['Model Name', 'Discount (%)'],
-        title="Price vs Quality Matrix (Bubble size = Review Count)",
-        color_discrete_sequence=colors
-    )
-    fig_scatter.update_layout(height=500)
-    st.plotly_chart(fig_scatter, use_container_width=True)
-    
+       
     # Key Insights
     st.markdown("### 🧠 AI-Powered Insights")
     
@@ -278,209 +226,6 @@ if page == '🏠 Executive Summary':
         </div>
         """, unsafe_allow_html=True)
 
-# ========== Market Intelligence Page ==========
-elif page == '💰 Market Intelligence':
-    st.title('💰 Advanced Market Intelligence')
-    
-    # Price distribution analysis
-    st.markdown("### 📊 Price Landscape Analysis")
-    
-    col1, col2 = st.columns(2)
-    
-    with col1:
-        # Enhanced price distribution
-        fig_price_dist = px.histogram(
-            filtered_df, 
-            x='Selling Price', 
-            nbins=30,
-            color='Price Category',
-            title='Price Distribution by Category',
-            color_discrete_sequence=colors
-        )
-        fig_price_dist.update_layout(height=400)
-        st.plotly_chart(fig_price_dist, use_container_width=True)
-    
-    with col2:
-        # Box plot for price by brand
-        fig_price_box = px.box(
-            filtered_df, 
-            x='Brand Name', 
-            y='Selling Price',
-            title='Price Range by Brand',
-            color='Brand Name',
-            color_discrete_sequence=colors
-        )
-        fig_price_box.update_xaxes(tickangle=45)
-        fig_price_box.update_layout(height=400, showlegend=False)
-        st.plotly_chart(fig_price_box, use_container_width=True)
-    
-    # Discount analysis
-    st.markdown("### 🏷️ Discount Strategy Analysis")
-    
-    col1, col2 = st.columns(2)
-    
-    with col1:
-        # Discount distribution
-        fig_discount = px.histogram(
-            filtered_df, 
-            x='Discount (%)', 
-            nbins=25,
-            title='Discount Distribution',
-            color_discrete_sequence=['#FF6B6B']
-        )
-        fig_discount.update_layout(height=400)
-        st.plotly_chart(fig_discount, use_container_width=True)
-    
-    with col2:
-        # Average discount by brand
-        avg_discount_brand = filtered_df.groupby('Brand Name')['Discount (%)'].mean().sort_values(ascending=False)
-        fig_discount_brand = px.bar(
-            x=avg_discount_brand.index,
-            y=avg_discount_brand.values,
-            title='Average Discount by Brand',
-            color=avg_discount_brand.values,
-            color_continuous_scale='Reds'
-        )
-        fig_discount_brand.update_xaxes(tickangle=45)
-        fig_discount_brand.update_layout(height=400)
-        st.plotly_chart(fig_discount_brand, use_container_width=True)
-    
-    # Price correlation matrix
-    st.markdown("### 🔗 Price Correlation Analysis")
-    numeric_cols = ['Selling Price', 'Original Price', 'Rating (Out of 5)', 'Reviews', 'Average Battery Life (in days)', 'Discount (%)']
-    corr_matrix = filtered_df[numeric_cols].corr()
-    
-    fig_corr = px.imshow(
-        corr_matrix,
-        title="Price & Performance Correlation Matrix",
-        color_continuous_scale='RdBu',
-        aspect='auto'
-    )
-    fig_corr.update_layout(height=500)
-    st.plotly_chart(fig_corr, use_container_width=True)
-
-# ========== Quality Insights Page ==========
-elif page == '⭐ Quality Insights':
-    st.title('⭐ Quality & Customer Satisfaction Analysis')
-    
-    # Rating distribution
-    st.markdown("### 📈 Rating Performance Dashboard")
-    
-    col1, col2 = st.columns(2)
-    
-    with col1:
-        # Rating distribution
-        rating_counts = filtered_df['Rating (Out of 5)'].value_counts().sort_index()
-        fig_rating_dist = px.bar(
-            x=rating_counts.index,
-            y=rating_counts.values,
-            title='Rating Distribution',
-            color=rating_counts.values,
-            color_continuous_scale='Viridis'
-        )
-        fig_rating_dist.update_layout(height=400)
-        st.plotly_chart(fig_rating_dist, use_container_width=True)
-    
-    with col2:
-        # Average rating by brand
-        avg_rating_brand = filtered_df.groupby('Brand Name')['Rating (Out of 5)'].mean().sort_values(ascending=False)
-        fig_rating_brand = px.bar(
-            x=avg_rating_brand.index,
-            y=avg_rating_brand.values,
-            title='Average Rating by Brand',
-            color=avg_rating_brand.values,
-            color_continuous_scale='Blues'
-        )
-        fig_rating_brand.update_xaxes(tickangle=45)
-        fig_rating_brand.update_layout(height=400)
-        st.plotly_chart(fig_rating_brand, use_container_width=True)
-    
-    # Review analysis
-    st.markdown("### 💬 Review Volume Analysis")
-    
-    col1, col2 = st.columns(2)
-    
-    with col1:
-        # Rating vs Reviews scatter
-        fig_rating_reviews = px.scatter(
-            filtered_df, 
-            x='Rating (Out of 5)', 
-            y='Reviews',
-            color='Brand Name',
-            size='Selling Price',
-            hover_data=['Model Name'],
-            title='Rating vs Review Volume',
-            color_discrete_sequence=colors
-        )
-        fig_rating_reviews.update_layout(height=400)
-        st.plotly_chart(fig_rating_reviews, use_container_width=True)
-    
-    with col2:
-        # Top reviewed products
-        top_reviewed = filtered_df.nlargest(10, 'Reviews')
-        fig_top_reviewed = px.bar(
-            top_reviewed,
-            x='Reviews',
-            y='Model Name',
-            orientation='h',
-            title='Top 10 Most Reviewed Products',
-            color='Rating (Out of 5)',
-            color_continuous_scale='RdYlGn'
-        )
-        fig_top_reviewed.update_layout(height=400)
-        st.plotly_chart(fig_top_reviewed, use_container_width=True)
-    
-    # Quality metrics
-    st.markdown("### 🏅 Quality Metrics Dashboard")
-    
-    # Create subplots for multiple metrics
-    fig = make_subplots(
-        rows=2, cols=2,
-        subplot_titles=('Rating by Price Category', 'Reviews by Device Type', 
-                       'Quality Score Distribution', 'Brand Performance Matrix'),
-        specs=[[{"type": "bar"}, {"type": "box"}],
-               [{"type": "histogram"}, {"type": "scatter"}]]
-    )
-    
-    # Rating by price category
-    rating_by_price = filtered_df.groupby('Price Category')['Rating (Out of 5)'].mean()
-    fig.add_trace(
-        go.Bar(x=rating_by_price.index, y=rating_by_price.values, name='Avg Rating'),
-        row=1, col=1
-    )
-    
-    # Reviews by device type
-    fig.add_trace(
-        go.Box(y=filtered_df['Reviews'], x=filtered_df['Device Type'], name='Reviews'),
-        row=1, col=2
-    )
-    
-    # Quality score distribution
-    fig.add_trace(
-        go.Histogram(x=filtered_df['Rating (Out of 5)'], name='Rating Distribution'),
-        row=2, col=1
-    )
-    
-    # Brand performance matrix
-    brand_perf = filtered_df.groupby('Brand Name').agg({
-        'Rating (Out of 5)': 'mean',
-        'Reviews': 'mean'
-    }).reset_index()
-    
-    fig.add_trace(
-        go.Scatter(
-            x=brand_perf['Rating (Out of 5)'], 
-            y=brand_perf['Reviews'],
-            mode='markers+text',
-            text=brand_perf['Brand Name'],
-            textposition='top center',
-            name='Brand Performance'
-        ),
-        row=2, col=2
-    )
-    
-    fig.update_layout(height=800, showlegend=False)
-    st.plotly_chart(fig, use_container_width=True)
 
 # ========== Feature Analysis Page ==========
 elif page == '📊 Feature Analysis':
@@ -560,37 +305,7 @@ elif page == '📊 Feature Analysis':
     fig_color.update_layout(height=500)
     st.plotly_chart(fig_color, use_container_width=True)
     
-    # Feature correlation with price and rating
-    st.markdown("### 🔗 Feature Impact Analysis")
-    
-    # Create feature impact matrix
-    feature_impact = pd.DataFrame({
-        'Feature': ['Display Type', 'Strap Material', 'Battery Life', 'Color'],
-        'Price Impact': [
-            filtered_df.groupby('Display')['Selling Price'].mean().std(),
-            filtered_df.groupby('Strap Material')['Selling Price'].mean().std(),
-            filtered_df['Average Battery Life (in days)'].corr(filtered_df['Selling Price']),
-            filtered_df.groupby('Color')['Selling Price'].mean().std()
-        ],
-        'Rating Impact': [
-            filtered_df.groupby('Display')['Rating (Out of 5)'].mean().std(),
-            filtered_df.groupby('Strap Material')['Rating (Out of 5)'].mean().std(),
-            filtered_df['Average Battery Life (in days)'].corr(filtered_df['Rating (Out of 5)']),
-            filtered_df.groupby('Color')['Rating (Out of 5)'].mean().std()
-        ]
-    })
-    
-    fig_impact = px.scatter(
-        feature_impact,
-        x='Price Impact',
-        y='Rating Impact',
-        size=[1000, 800, 600, 400],  # Different sizes for visual appeal
-        color='Feature',
-        title='Feature Impact on Price vs Rating',
-        color_discrete_sequence=colors
-    )
-    fig_impact.update_layout(height=500)
-    st.plotly_chart(fig_impact, use_container_width=True)
+       
 
 # ========== Product Rankings Page ==========
 elif page == '🏆 Product Rankings':
@@ -702,44 +417,7 @@ elif page == '🔍 Deep Dive Analytics':
     # Advanced analytics dashboard
    
     
-    # Trend analysis
-    st.markdown("### 📊 Trend Analysis")
-    
-    col1, col2 = st.columns(2)
-    
-    with col1:
-        # Price segments performance
-        price_segment_perf = filtered_df.groupby('Price Category').agg({
-            'Rating (Out of 5)': 'mean',
-            'Reviews': 'mean',
-            'Discount (%)': 'mean',
-            'Average Battery Life (in days)': 'mean'
-        }).round(2)
-        
-        fig_segment = px.bar(
-            x=price_segment_perf.index,
-            y=price_segment_perf['Rating (Out of 5)'],
-            title='Performance by Price Segment',
-            color=price_segment_perf['Rating (Out of 5)'],
-            color_continuous_scale='Blues'
-        )
-        fig_segment.update_layout(height=400)
-        st.plotly_chart(fig_segment, use_container_width=True)
-    
-    with col2:
-        # Feature premium analysis
-        display_premium = filtered_df.groupby('Display')['Selling Price'].mean().sort_values(ascending=False)
-        fig_premium = px.bar(
-            x=display_premium.index,
-            y=display_premium.values,
-            title='Display Type Price Premium',
-            color=display_premium.values,
-            color_continuous_scale='Reds'
-        )
-        fig_premium.update_xaxes(tickangle=45)
-        fig_premium.update_layout(height=400)
-        st.plotly_chart(fig_premium, use_container_width=True)
-    
+      
     # Advanced insights
     st.markdown("### 🎯 Strategic Insights")
     
@@ -796,7 +474,7 @@ elif page == '🔍 Deep Dive Analytics':
     comp_matrix = comp_matrix.reset_index()
     
     # Display competitive matrix
-    st.dataframe(
+    st.write(
         comp_matrix.style.background_gradient(subset=['Avg_Rating', 'Total_Reviews'], cmap='Greens')
                           .background_gradient(subset=['Avg_Price'], cmap='Reds_r')
                           .background_gradient(subset=['Avg_Discount'], cmap='Blues'),
